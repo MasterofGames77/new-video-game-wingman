@@ -1,5 +1,8 @@
+import mongoose from 'mongoose';
 import User from '../models/User';
+import connectToMongoDB from './mongodb';
 
+// Define the structure of a user from the splash page database
 interface SplashPageUser {
   email: string;
   userId: string;
@@ -8,19 +11,42 @@ interface SplashPageUser {
   hasProAccess: boolean;
 }
 
-export const syncUserData = async (splashPageUser: SplashPageUser) => {
+export const syncUserToMainDB = async (email: string) => {
   try {
-    // Check if user already exists in vgWingman database
-    const existingUser = await User.findOne({ email: splashPageUser.email });
+    // Step 1: Connect to splash page database (newWingman)
+    await connectToMongoDB('newWingman');
+    
+    // Create a temporary model for the splash page users
+    const SplashUser = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
+      email: String,
+      userId: String,
+      position: Number,
+      isApproved: Boolean,
+      hasProAccess: Boolean
+    }));
+
+    // Step 2: Find the user in splash page database
+    const splashUser = await SplashUser.findOne({ email });
+    
+    // Step 3: Verify user exists and is approved
+    if (!splashUser || !splashUser.isApproved) {
+      throw new Error('User not found or not approved');
+    }
+
+    // Step 4: Switch connection to main app database (vgWingman)
+    await connectToMongoDB('vgWingman');
+    
+    // Step 5: Check if user already exists in main database
+    const existingUser = await User.findOne({ email });
     
     if (!existingUser) {
-      // Create new user in vgWingman database with initial values
+      // Step 6: Create new user in main database with all required fields
       const newUser = new User({
-        email: splashPageUser.email,
-        userId: splashPageUser.userId,
-        position: splashPageUser.isApproved ? null : splashPageUser.position,
-        isApproved: splashPageUser.isApproved,
-        hasProAccess: splashPageUser.hasProAccess,
+        email: splashUser.email,
+        userId: splashUser.userId,
+        position: null, // Approved users don't need position
+        isApproved: true,
+        hasProAccess: splashUser.hasProAccess,
         conversationCount: 0,
         achievements: [],
         progress: {
@@ -53,25 +79,10 @@ export const syncUserData = async (splashPageUser: SplashPageUser) => {
       return newUser;
     }
 
-    // Update existing user if needed
-    return await User.findOneAndUpdate(
-      { email: splashPageUser.email },
-      {
-        isApproved: splashPageUser.isApproved,
-        hasProAccess: splashPageUser.hasProAccess,
-        position: splashPageUser.isApproved ? null : splashPageUser.position
-      },
-      { new: true }
-    );
+    // Step 7: Return existing user if already in database
+    return existingUser;
   } catch (error) {
-    console.error('Error syncing user data:', error);
+    console.error('Error syncing user to main DB:', error);
     throw error;
   }
-};
-
-export const checkAndAssignProAccess = async (email: string): Promise<boolean> => {
-  const signupDeadline = new Date('2024-12-31T23:59:59.999Z');
-  const currentDate = new Date();
-
-  return currentDate <= signupDeadline;
 }; 
