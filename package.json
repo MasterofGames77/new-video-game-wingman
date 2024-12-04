@@ -1,12 +1,17 @@
 {
   "name": "video-game-wingman",
   "version": "0.1.0",
+  "engines": {
+    "node": "20.x"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cache-build": "npm run build",
+    "heroku-postbuild": "npm run cache-build"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.7.1",

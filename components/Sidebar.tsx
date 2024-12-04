@@ -60,11 +60,11 @@ const Sidebar = ({
     const titlePattern = new RegExp(keywords.join("|"), "i");
     const match = question.match(titlePattern);
 
-    let context = match ? match[0] : null; // Capture the context if found
-    let title = question.split(/\s+/).slice(0, 8).join(" "); // Get the first few words of the question
+    const context = match ? match[0] : null; // Capture the context if found
+    const title = question.split(/\s+/).slice(0, 8).join(" "); // Get the first few words of the question
 
     // Create the summary based on whether a context is found or not
-    let summary = context ? title : title; // Only use the title if context is null
+    const summary = context ? title : title; // Only use the title if context is null
 
     return summary.length > 50 ? `${summary.substring(0, 47)}...` : summary;
   };
