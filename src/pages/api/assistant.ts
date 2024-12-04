@@ -5,15 +5,11 @@ import Question from '../../../models/Question';
 import User, { IUser } from '../../../models/User';
 import { getChatCompletion, fetchRecommendations, analyzeUserQuestions } from '../../../utils/aiHelper';
 import { getClientCredentialsAccessToken, getAccessToken, getTwitchUserData, redirectToTwitch } from '../../../utils/twitchAuth';
-import OpenAI from 'openai';
 import path from 'path';
 import { readFile } from 'fs/promises';
 import { parse } from 'csv-parse/sync';
 import { getIO } from '../../../middleware/realtime';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 const CSV_FILE_PATH = path.join(process.cwd(), 'data/Video Games Data.csv');
 

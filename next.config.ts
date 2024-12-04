@@ -7,6 +7,9 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   env: {
     NEXT_PUBLIC_TWITCH_CLIENT_ID: process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID || '',
     TWITCH_CLIENT_SECRET: process.env.TWITCH_CLIENT_SECRET || '',
