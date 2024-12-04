@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { syncUserData, checkAndAssignProAccess } from '../../../utils/databaseSync';
+import { syncUserToMainDB } from '../../../utils/databaseSync';
 import connectToMongoDB from '../../../utils/mongodb';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -12,18 +12,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     const { email, userId, position, isApproved } = req.body;
     
-    // Check if user qualifies for pro access
-    const shouldHaveProAccess = await checkAndAssignProAccess(email);
+    // Check if user qualifies for pro access based on position
+    const hasProAccess = typeof position === 'number' && position <= 5000;
     
     const userData = {
       email,
       userId,
       position,
       isApproved,
-      hasProAccess: shouldHaveProAccess
+      hasProAccess
     };
 
-    const syncedUser = await syncUserData(userData);
+    const syncedUser = await syncUserToMainDB(email);
     
     res.status(200).json({ success: true, user: syncedUser });
   } catch (error) {
