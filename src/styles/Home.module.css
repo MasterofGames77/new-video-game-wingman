@@ -17,8 +17,13 @@
   align-items: center;
 }
 
-.loading {
+.loading,
+.error {
   text-align: center;
+}
+
+.error {
+  color: #ff4444;
 }
 
 .spinner {
