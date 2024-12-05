@@ -35,7 +35,7 @@ export default function Home() {
             console.log("Initialization failed, redirecting to splash...");
             setError("User initialization failed");
             window.location.href =
-              "https://vgw-splash-page-frontend-71431835113b.herokuapp.com/";
+              "https://videogamewingman.com?email=" + email;
           }
         } else {
           console.log("No email found, checking existing auth...");
@@ -47,7 +47,8 @@ export default function Home() {
             router.push("/chat");
           } else {
             console.log("Not authenticated, redirecting to splash...");
-            window.location.href = "https://newwingman.com";
+            window.location.href =
+              "https://vgw-splash-page-frontend-71431835113b.herokuapp.com/";
           }
         }
       } catch (error) {
